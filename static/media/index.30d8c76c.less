@@ -1,0 +1,20 @@
+:global {
+  .two-rows-label .ant-form-item-label {
+    padding: 4px 0 !important;
+    label {
+      white-space: normal;
+      margin-right: 12px;
+      display: inline-block;
+      text-align: center;
+      line-height: 12px;
+      width: 50px;
+      &:after {
+        content: none !important;
+      }
+      &.ant-form-item-required:before {
+        position: absolute;
+        left: -7px;
+      }
+    }
+  }
+}
