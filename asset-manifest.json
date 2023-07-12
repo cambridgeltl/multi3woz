@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/multi3woz/static/css/main.073c9b0a.css",
+    "main.js": "/multi3woz/static/js/main.034190e5.js",
+    "static/js/787.ac23f499.chunk.js": "/multi3woz/static/js/787.ac23f499.chunk.js",
+    "static/media/logo.svg": "/multi3woz/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/multi3woz/index.html",
+    "main.073c9b0a.css.map": "/multi3woz/static/css/main.073c9b0a.css.map",
+    "main.034190e5.js.map": "/multi3woz/static/js/main.034190e5.js.map",
+    "787.ac23f499.chunk.js.map": "/multi3woz/static/js/787.ac23f499.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.034190e5.js"
+  ]
+}
