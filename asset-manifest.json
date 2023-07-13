@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/multi3woz/static/css/main.5ecd60fb.chunk.css",
-    "main.js": "/multi3woz/static/js/main.ef2f421a.chunk.js",
-    "main.js.map": "/multi3woz/static/js/main.ef2f421a.chunk.js.map",
+    "main.js": "/multi3woz/static/js/main.10090d01.chunk.js",
+    "main.js.map": "/multi3woz/static/js/main.10090d01.chunk.js.map",
     "runtime-main.js": "/multi3woz/static/js/runtime-main.d97010cd.js",
     "runtime-main.js.map": "/multi3woz/static/js/runtime-main.d97010cd.js.map",
     "static/css/2.bb57abf7.chunk.css": "/multi3woz/static/css/2.bb57abf7.chunk.css",
     "static/js/2.bb771ac3.chunk.js": "/multi3woz/static/js/2.bb771ac3.chunk.js",
     "static/js/2.bb771ac3.chunk.js.map": "/multi3woz/static/js/2.bb771ac3.chunk.js.map",
     "index.html": "/multi3woz/index.html",
-    "precache-manifest.a768af83001701dc146a5ac06e1a2c04.js": "/multi3woz/precache-manifest.a768af83001701dc146a5ac06e1a2c04.js",
+    "precache-manifest.a332134900648c3c5a4c0cf695c41e18.js": "/multi3woz/precache-manifest.a332134900648c3c5a4c0cf695c41e18.js",
     "service-worker.js": "/multi3woz/service-worker.js",
     "static/css/2.bb57abf7.chunk.css.map": "/multi3woz/static/css/2.bb57abf7.chunk.css.map",
     "static/css/main.5ecd60fb.chunk.css.map": "/multi3woz/static/css/main.5ecd60fb.chunk.css.map",
@@ -22,6 +22,6 @@
     "static/css/2.bb57abf7.chunk.css",
     "static/js/2.bb771ac3.chunk.js",
     "static/css/main.5ecd60fb.chunk.css",
-    "static/js/main.ef2f421a.chunk.js"
+    "static/js/main.10090d01.chunk.js"
   ]
 }

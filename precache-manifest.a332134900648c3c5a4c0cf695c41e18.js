@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "dde65a2a6773af6e3795b44f0a39bd88",
+    "revision": "7b16b8134d73d93d37a19cac649a7df3",
     "url": "/multi3woz/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/multi3woz/static/css/2.bb57abf7.chunk.css"
   },
   {
-    "revision": "62e3cd782729746e68e8",
+    "revision": "7e379d1ee84609e0fa57",
     "url": "/multi3woz/static/css/main.5ecd60fb.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/multi3woz/static/js/2.bb771ac3.chunk.js"
   },
   {
-    "revision": "62e3cd782729746e68e8",
-    "url": "/multi3woz/static/js/main.ef2f421a.chunk.js"
+    "revision": "7e379d1ee84609e0fa57",
+    "url": "/multi3woz/static/js/main.10090d01.chunk.js"
   },
   {
     "revision": "73ad9c6a39e49317f8cf",
