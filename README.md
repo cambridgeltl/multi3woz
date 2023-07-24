@@ -5,7 +5,7 @@ Code repository for the paper: <br>
 
 
 ***Multi3WOZ: A Multilingual, Multi-Domain, Multi-Parallel Dataset for Training and Evaluating Culturally Adapted Task-Oriented Dialog Systems***
-by [Songbo Hu](https://songbohu.github.io) &ast;, [Han Zhou](https://hzhou.top) &ast;, [Mete Hergul](), [Milan Gritta](https://github.com/milangritta), [Guchun Zhang](), [Ignacio Iacobacci](https://iiacobac.wordpress.com), [Ivan Vulić](https://sites.google.com/site/ivanvulic/) &ast;&ast;, and [Anna Korhonen](https://sites.google.com/site/annakorhonen/) &ast;&ast;.
+by [Songbo Hu](https://songbohu.github.io),&ast; [Han Zhou](https://hzhou.top),&ast; [Mete Hergul](), [Milan Gritta](https://github.com/milangritta), [Guchun Zhang](), [Ignacio Iacobacci](https://iiacobac.wordpress.com), [Ivan Vulić](https://sites.google.com/site/ivanvulic/), &ast;&ast; and [Anna Korhonen](https://sites.google.com/site/annakorhonen/). &ast;&ast;
 
 
 Multi3WOZ is a novel multilingual, multi-domain, multi-parallel task-oriented dialogue (ToD) dataset. It is large-scale and offers culturally adapted dialogues in 4 languages to enable training and evaluation of multilingual and cross-lingual ToD systems. This dataset is collected via a complex bottom-up data collection process, as shown in the following figure.
