@@ -1,0 +1,1 @@
+python train_language_modelling.py -c ./config/example_modelling.cfg --do_train

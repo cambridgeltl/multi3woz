@@ -1,0 +1,1 @@
+python train_slot_labelling.py -c ./config/example_labelling.cfg --do_train --do_test
