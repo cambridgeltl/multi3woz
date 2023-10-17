@@ -41,5 +41,5 @@ You can customize the scripts for your need including:
   - `model_checkpoint`: use different LLMs (we report the performance using [mt5-small](https://huggingface.co/google/mt5-small/tree/main)).
   - `data_dir`: define the source language.
   - `few_shots_percent`: specify the percent of training data.
-- Use different hyperparameters such as `train_batch_size` and `n_epochs`.
-
+  - Use different hyperparameters such as `train_batch_size` and `n_epochs`.
+  - Use the `few_shots_key` to select different data collection strategies in Section 5 RQ4. These keys are in the format of "strategy" + "proportion" of the data. For example, random0.1 denotes we randomly select 10% of the training or validation data in Multi3WOZ. "trigram0.1" means that we select 10% of the data that maximise the trigram coverage of the chosen dialogues. Currently, we support five "strategies": "random", "domain", "slot", "length", and "trigram". We support proportions from 0.01, 0.02, 0.03 to 0.09 and 0.1, 0.2 to 1.0. To find how these subsets of dialogues are selected exactly, please check the jupyter notebook at ./data/build_parallel_dic.ipynb

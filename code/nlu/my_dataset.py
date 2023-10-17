@@ -3,23 +3,60 @@ from datasets import Dataset, DatasetDict
 import pandas as pd
 import os
 from transformers import AutoTokenizer
+from transformers import set_seed
+
 
 class MultilingualMultiWoZDataset():
-	def __init__(self, config):
+	def __init__(self, config, language = None):
 
 		assert config
 		self.config = config
 
-		self.language = self.config["experiment"]["language"].lower()
-		assert self.language in ["arabic", "english", "french", "turkish"]
+
+		set_seed(int(config["experiment"]["seed"]))
 
 		project_root_path = config["project"]["project_root_path"]
-
 		self.is_dev = False
 		if "is_development" in self.config["project"]:
 			self.is_dev = config["project"]["is_development"].lower() == "true"
 
-		self.data_path = os.path.join(project_root_path, config["data"][self.language + "_data_path"])
+
+		self.parallel_dic_path = os.path.join(project_root_path, config["data"]["parallel_dic_path"])
+		with open(self.parallel_dic_path, "r", encoding="utf-8") as f:
+			self.parallel_dic = json.load(f)
+
+
+		self.train_languages_json = json.loads(self.config["experiment"]["train_languages"])
+		self.train_languages = []
+
+
+
+		for this_language, dial_key, in self.train_languages_json.items():
+			assert this_language.lower() in ["arabic", "english", "french", "turkish"]
+			assert dial_key in self.parallel_dic["train"]
+
+			this_data_path = os.path.join(project_root_path, config["data"][this_language + "_data_path"])
+			self.train_languages.append((this_language.lower(), dial_key, this_data_path))
+
+		self.val_languages_json = json.loads(self.config["experiment"]["val_languages"])
+		self.val_languages = []
+
+		for this_language, dial_key, in self.val_languages_json.items():
+			assert this_language.lower() in ["arabic", "english", "french", "turkish"]
+			assert dial_key in self.parallel_dic["val"]
+			this_data_path = os.path.join(project_root_path, config["data"][this_language + "_data_path"])
+
+			self.val_languages.append((this_language.lower(), dial_key, this_data_path))
+
+
+		self.test_languages_json = json.loads(self.config["experiment"]["test_languages"])
+		self.test_languages = []
+
+		for this_language, dial_key, in self.test_languages_json.items():
+			assert this_language.lower() in ["arabic", "english", "french", "turkish"]
+			assert dial_key in self.parallel_dic["test"]
+			this_data_path = os.path.join(project_root_path, config["data"][this_language + "_data_path"])
+			self.test_languages.append((this_language.lower(), dial_key, this_data_path))
 
 		self.raw_train_dic, self.raw_val_dic, self.raw_test_dic = self._load_raw_dataset()
 
@@ -40,6 +77,63 @@ class MultilingualMultiWoZDataset():
 		num_added_tokens = self.tokenizer.add_tokens(self.special_token_list, special_tokens=True)
 		self.turn_sep_id, self.history_sep_id = self.tokenizer.convert_tokens_to_ids(["[turn_sep]", "[history_sep]"])
 
+
+
+	def _load_raw_dataset(self):
+
+		language_split_data_dic = {}
+		for languages in [self.train_languages, self.val_languages, self.test_languages]:
+			for language, dial_key , data_path in languages:
+
+				if not language_split_data_dic.get(language):
+
+					split_dic = {
+						"train": {},
+						"val": {},
+						"test": {},
+					}
+					with open(os.path.join(data_path, "data.json"), "r", encoding="utf-8") as f:
+						data = json.load(f)
+					f = open(os.path.join(data_path, "valListFile.txt"))
+					val_list = f.read().splitlines()
+					f.close()
+					f = open(os.path.join(data_path, "testListFile.txt"))
+					test_list = f.read().splitlines()
+					f.close()
+					train_list = list(filter(lambda x : x not in test_list + val_list, data.keys()))
+					for dial_id, dial in data.items():
+						if dial_id in test_list:
+							split_dic["test"][dial_id] = dial
+						elif dial_id in val_list:
+							split_dic["val"][dial_id] = dial
+						elif dial_id in train_list:
+							split_dic["train"][dial_id] = dial
+					language_split_data_dic[language] = split_dic
+
+
+		data_dic = {
+			"train": {},
+			"val": {},
+			"test": {}
+		}
+
+		for data_split, languages  in \
+			[("train", self.train_languages), ("val", self.val_languages), ("test", self.test_languages)]:
+
+			for language, dial_key, data_path in languages:
+
+
+				target_dic = data_dic[data_split]
+				target_data = language_split_data_dic[language][data_split]
+				target_list = self.parallel_dic[data_split][dial_key]
+
+				for dial_id in target_list:
+					target_dic[language + "_"+ dial_id] = target_data[dial_id]
+
+
+		return data_dic["train"], data_dic["val"], data_dic["test"]
+
+
 	def load_data(self, task = None):
 
 		if task is not None:
@@ -51,21 +145,23 @@ class MultilingualMultiWoZDataset():
 
 		dataset_dict = None
 		if self.task == "labelling":
+
 			processed_data = self._preprocess_labelling_dataset()
 			for data_key, data in processed_data.items():
 				data = pd.DataFrame.from_dict(data)
 				data = Dataset.from_pandas(data)
 				processed_data[data_key] = data
+
 			dataset_dict = DatasetDict(processed_data)
 
 		elif self.task == "intent":
-
 			processed_data = self._preprocess_intent_dataset()
 			for data_key, data in processed_data.items():
 				data = pd.DataFrame.from_dict(data)
 				data = Dataset.from_pandas(data)
 				processed_data[data_key] = data
 			dataset_dict = DatasetDict(processed_data)
+
 
 		return dataset_dict
 
@@ -82,10 +178,8 @@ class MultilingualMultiWoZDataset():
 		index_to_label = {}
 		label_counter = -1
 		for data_key, dataset in self.raw_data_dic.items():
-
 			processed_data[data_key] = []
 			for dial_id, dial in list(dataset.items()):
-
 				context = []
 				for turn_id, turn in enumerate(dial['log']):
 
@@ -106,6 +200,7 @@ class MultilingualMultiWoZDataset():
 						context_text = context_text + " [history_sep] "
 					text = context_text + turn["text"]
 
+
 					data_entry = {}
 
 					data_entry["text"] = text
@@ -116,13 +211,14 @@ class MultilingualMultiWoZDataset():
 
 					temp_label = []
 					for temp_intent in turn["dialog_act"].keys():
-
 						if temp_intent not in label_to_index:
 							label_counter += 1
 							index_to_label[label_counter] = temp_intent
 							label_to_index[temp_intent] = label_counter
 						temp_label.append(label_to_index[temp_intent])
 					data_entry["intent_idx"] = temp_label
+
+
 
 					processed_data[data_key].append(data_entry)
 					context.append(turn['text'])
@@ -145,6 +241,7 @@ class MultilingualMultiWoZDataset():
 
 		for data_key, data_set in self.raw_data_dic.items():
 			for dial_id, dial in data_set.items():
+
 				for turn_id, turn in enumerate(dial['log']):
 					text = turn["text"]
 					tokenized_result = tokenizer(text)
@@ -184,6 +281,7 @@ class MultilingualMultiWoZDataset():
 								if char_idx in char_token_map:
 									bio_token_tag_seq[char_token_map[char_idx]] = key
 
+
 					new_bio_token_tag_seq = []
 					pre_tag = None
 					for tag, tk_word_id in zip(bio_token_tag_seq, tokenized_result.word_ids()):
@@ -216,7 +314,8 @@ class MultilingualMultiWoZDataset():
 
 	def _preprocess_labelling_dataset(self):
 
-		processed_raw_dic,  label_to_index, index_to_label = self._build_bio_tag_sequence()
+		processed_raw_dic, label_to_index, index_to_label = self._build_bio_tag_sequence()
+
 		self.label_to_index = label_to_index
 		self.index_to_label = index_to_label
 		self.processed_data_dic = processed_raw_dic
@@ -227,13 +326,20 @@ class MultilingualMultiWoZDataset():
 
 		assert self.process_mode in ["all", "user", "system"]
 
+
 		processed_data = {}
+
+		all_da = []
+		all_intent = []
+		all_tag = []
+
+
+
 
 		for data_key, data_set in self.raw_data_dic.items():
 			processed_data[data_key] = []
 
 			for dial_id, dial in list(data_set.items())[: 1 if self.is_dev else len(data_set)]:
-
 				context = []
 
 				for turn_id, turn in enumerate(dial['log']):
@@ -257,9 +363,11 @@ class MultilingualMultiWoZDataset():
 					data_entry["turn_id"] = turn_id
 					data_entry["dail_id"] = dial_id
 
+
 					data_entry["input_ids"] = tokenized_result["input_ids"]
 					data_entry["labels"] = turn["token_bio_tag"]
 					data_entry["attention_mask"] = tokenized_result["attention_mask"]
+
 
 					if self.context_window <= 1:
 						context_text = ""
@@ -290,33 +398,6 @@ class MultilingualMultiWoZDataset():
 					context.append(turn['text'])
 
 		return processed_data
-
-	def _load_raw_dataset(self):
-
-		with open(os.path.join(self.data_path, "data.json"), "r", encoding="utf-8") as f:
-			data = json.load(f)
-
-		f = open(os.path.join(self.data_path, "valListFile.txt"))
-		val_list = f.read().splitlines()
-		f.close()
-		f = open(os.path.join(self.data_path, "testListFile.txt"))
-		test_list = f.read().splitlines()
-		f.close()
-
-		train_dic = {}
-		val_dic = {}
-		test_dic = {}
-
-		for dial_id, dial in data.items():
-			if dial_id in test_list:
-				test_dic[dial_id] = dial
-			elif dial_id in val_list:
-				val_dic[dial_id] = dial
-			else:
-				train_dic[dial_id] = dial
-
-		assert len(train_dic) + len(val_dic) + len(test_dic) == len(data)
-		return train_dic, val_dic, test_dic
 
 	def map_token_bio_to_char_bio(self, data_entry, prediction_seq):
 
@@ -372,4 +453,3 @@ class MultilingualMultiWoZDataset():
 				new_char_bio_tag[i] = "I-" + pre_slot_val
 			new_char_bio_tag[current_start_idx] = "B-" + pre_slot_val
 		return new_char_bio_tag
-

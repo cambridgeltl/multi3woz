@@ -102,10 +102,10 @@ def train(args, *more):
 
     print('0')
 
-    model = MT5ForConditionalGeneration.from_pretrained(args["model_checkpoint"], cache_dir="/home/sh2091/rds/hpc-work/cache/")
+    model = MT5ForConditionalGeneration.from_pretrained(args["model_checkpoint"])
     print('1')
     tokenizer = T5Tokenizer.from_pretrained(args["model_checkpoint"], bos_token="[bos]", eos_token="[eos]",
-                                            sep_token="[sep]",  cache_dir="/home/sh2091/rds/hpc-work/cache/")
+                                            sep_token="[sep]")
     print('2')
     model.resize_token_embeddings(new_num_tokens=len(tokenizer))
     print('3')

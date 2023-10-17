@@ -1,1 +1,0 @@
-python train_surface_realisation.py -c ./config/example_realisation.cfg --do_train

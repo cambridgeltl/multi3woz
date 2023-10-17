@@ -30,8 +30,8 @@ def get_args():
     parser.add_argument("--mode", type=str, default="train")
     parser.add_argument("--data_dir", type=str, default="data")
     parser.add_argument("--few_shots_percent", type=int, default=100, help="the percentage of cross-lingual transfer learning datasets for training")
-    # parser.add_argument("--dial_ids_dir", type=str, default="none")
-    # parser.add_argument("--dial_ids_description", type=str, default="random0.01")
+    parser.add_argument("--dial_ids_dir", type=str, default="none")
+    parser.add_argument("--dial_ids_description", type=str, default="random0.01")
 
     args = parser.parse_args()
     return args

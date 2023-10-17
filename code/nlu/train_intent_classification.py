@@ -1,8 +1,16 @@
 import shutil
-from my_dataset import MultilingualMultiWoZDataset
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from transformers import DataCollatorWithPadding
+import sys
 
+import torch
+from torch import Tensor
+
+from my_dataset import MultilingualMultiWoZDataset
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, EarlyStoppingCallback
+from transformers import DataCollatorWithPadding
+from transformers import TrainingArguments, Trainer
+import evaluate
+from argparse import ArgumentParser
+import numpy as np
 import configparser
 import argparse
 import json
@@ -10,12 +18,13 @@ import os
 
 import numpy as np
 from transformers import set_seed
+from tqdm import tqdm
 
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score, precision_score, recall_score
 from transformers import EvalPrediction
 import torch
 
-from transformers import TrainingArguments, Trainer
+from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer
 
 result_dic = {}
 
@@ -27,7 +36,6 @@ def run_experiment():
     parser.add_argument("-C","-c", "--config", help="set config file", required=True, type=argparse.FileType('r'))
     parser.add_argument("-s", "--seed", help="set random seed", type=int)
     parser.add_argument("--do_train", action='store_true')
-
     args = parser.parse_args()
 
     config = None
@@ -71,10 +79,10 @@ def train(config):
     label2id = dataset.label_to_index
     id2label = dataset.index_to_label
 
-
     model = AutoModelForSequenceClassification.from_pretrained(
         model_name, num_labels=len(id2label), id2label=id2label, label2id=label2id,
-        problem_type="multi_label_classification"
+        problem_type="multi_label_classification",
+        ignore_mismatched_sizes=True
     )
 
     tokenizer.add_tokens(dataset.special_token_list, special_tokens=True)
@@ -117,7 +125,6 @@ def train(config):
                    "precision": precision,
                    "recall" : recall,
                    }
-
         return metrics
 
     def compute_metrics(p: EvalPrediction):
@@ -133,10 +140,12 @@ def train(config):
         learning_rate=float(config["experiment"]["learning_rate"]),
         per_device_train_batch_size=int(config["experiment"]["batch_size"]),
         per_device_eval_batch_size=int(config["experiment"]["batch_size"]),
-        num_train_epochs=int(config["experiment"]["training_epoch"]),
+        max_steps = int(config["experiment"]["max_training_steps"]),
+        save_steps=int(config["experiment"]["eval_and_save_steps"]),
+        eval_steps=int(config["experiment"]["eval_and_save_steps"]),
+        save_strategy="steps",
+        evaluation_strategy="steps",
         weight_decay=float(config["experiment"]["weight_decay"]),
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
         load_best_model_at_end=True,
         push_to_hub=False,
         save_total_limit=int(config["experiment"]["save_total_limit"]),
@@ -152,6 +161,8 @@ def train(config):
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics,
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=int(config["experiment"]["early_stopping_patience"]))]
+
     )
 
     trainer.train()
@@ -160,17 +171,14 @@ def train(config):
     result_dic["dev_result"] = dev_result
     print(dev_result)
 
-
     test_result = trainer.evaluate(tokenized_dataset["test"])
     result_dic["test_result"] = test_result
     print(test_result)
 
     trainer.save_model(os.path.join(config["experiment"]["output_dir"], "checkpoint-best"))
 
-
 def main():
     run_experiment()
-
 
 if __name__ == '__main__':
     main()

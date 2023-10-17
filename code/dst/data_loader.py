@@ -221,20 +221,17 @@ def prepare_data(args, tokenizer):
     ontology = json.load(open(args['data_dir'] + "/ontology.json", 'r'))
     ALL_SLOTS = get_slot_information(ontology)
     description = json.load(open("utils/slot_description.json", 'r'))
-    # dial_ids = json.load(open(args['dial_ids_dir'], "r"))
-    # train_dial_ids = dial_ids["train"][args["dial_ids_description"]]
-    # dev_dial_ids = dial_ids["val"][args["dial_ids_description"]]
-    # test_dial_ids = dial_ids["test"]["random1.0"]
+    dial_ids = json.load(open(args['dial_ids_dir'], "r"))
+    train_dial_ids = dial_ids["train"][args["dial_ids_description"]]
+    dev_dial_ids = dial_ids["val"][args["dial_ids_description"]]
+    test_dial_ids = dial_ids["test"]["random1.0"]
     data_train, _ = read_data(args, path_train, ALL_SLOTS, tokenizer, description, "train")
     data_dev, _ = read_data(args, path_dev, ALL_SLOTS, tokenizer, description, "dev")
     data_test, ALL_SLOTS = read_data(args, path_test, ALL_SLOTS, tokenizer, description, "test")
 
-    # data_train = [d for d in data_train if d["ID"] in train_dial_ids]
-    # data_dev = [d for d in data_dev if d["ID"] in dev_dial_ids]
-    # data_test = [d for d in data_test if d["ID"] in test_dial_ids]
-    data_train = [d for d in data_train]
-    data_dev = [d for d in data_dev]
-    data_test = [d for d in data_test]
+    data_train = [d for d in data_train if d["ID"] in train_dial_ids]
+    data_dev = [d for d in data_dev if d["ID"] in dev_dial_ids]
+    data_test = [d for d in data_test if d["ID"] in test_dial_ids]
     # split_n = int(args['few_shots_percent'] * len(data_train) / 100)
     # print('we are splitting at:', split_n)
     # print('before splitting, the length of the train set', len(data_train))

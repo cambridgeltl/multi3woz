@@ -1,13 +1,13 @@
 import shutil
-
 from my_dataset import MultilingualMultiWoZDataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, \
-    DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments
+    DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments, EarlyStoppingCallback
 
 import configparser
 import argparse
 import json
 import os
+
 import evaluate
 import numpy as np
 from transformers import set_seed
@@ -56,26 +56,25 @@ def train(config):
     model_name = config["experiment"]["model_name"]
     set_seed(int(config["experiment"]["seed"]))
 
-    current_language = config["experiment"]["language"].lower()
+    current_languages = list(map(lambda x: x.lower(), json.loads(config["experiment"]["test_languages"])))
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
-        truncation_side="left"
-    )
+        truncation_side="left")
 
     dataset = MultilingualMultiWoZDataset(config)
     data_dic = dataset.load_data()
 
-    target_lang = current_language
-    prefix = "dialogue generation from dialogue act to " + target_lang + " utterance:"
+    prefix = "generation dialogue utterance in "
 
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     num_added_tokens = tokenizer.add_tokens(dataset.special_token_list, special_tokens=True)
     model.resize_token_embeddings(len(tokenizer))
 
     def preprocess_function(examples):
-        inputs = [prefix + example for example in examples["source"]]
+        inputs = [prefix + lang.split("_")[0] + ":" + example for (example, lang) in zip(examples["source"], examples["dail_id"])]
         targets = [example for example in examples["target"]]
+
         model_inputs = tokenizer(inputs, text_target=targets, max_length=512, truncation=True)
         return model_inputs
 
@@ -91,6 +90,7 @@ def train(config):
     def postprocess_text(preds, labels):
         preds = [pred.strip() for pred in preds]
         labels = [[label.strip()] for label in labels]
+
         return preds, labels
 
     def compute_metrics(eval_preds):
@@ -114,22 +114,26 @@ def train(config):
             result[key] = score
         result["meteor"] = meteor_result["meteor"]
 
+
         prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
         result["gen_len"] = np.mean(prediction_lens)
         result = {k: round(v, 4) for k, v in result.items()}
         return result
 
+
     training_args = Seq2SeqTrainingArguments(
         output_dir=config["experiment"]["output_dir"],
-        evaluation_strategy="epoch",
         learning_rate=float(config["experiment"]["learning_rate"]),
         per_device_train_batch_size=int(config["experiment"]["batch_size"]),
         per_device_eval_batch_size=int(config["experiment"]["batch_size"]),
-        num_train_epochs=int(config["experiment"]["training_epoch"]),
         weight_decay=float(config["experiment"]["weight_decay"]),
         save_total_limit=int(config["experiment"]["save_total_limit"]),
         predict_with_generate=True,
-        save_strategy="epoch",
+        max_steps=int(config["experiment"]["max_training_steps"]),
+        save_steps=int(config["experiment"]["eval_and_save_steps"]),
+        eval_steps=int(config["experiment"]["eval_and_save_steps"]),
+        save_strategy="steps",
+        evaluation_strategy="steps",
         load_best_model_at_end=True,
         push_to_hub=False,
         fp16=config["experiment"]["fp16"].lower()=="true",
@@ -145,6 +149,7 @@ def train(config):
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=int(config["experiment"]["early_stopping_patience"]))]
     )
 
     trainer.train()
@@ -153,16 +158,15 @@ def train(config):
     result_dic["dev_result"] = dev_result
     print(dev_result)
 
+
     test_result = trainer.evaluate(tokenized_dataset["test"])
     result_dic["test_result"] = test_result
     print(test_result)
 
     trainer.save_model(os.path.join(config["experiment"]["output_dir"], "checkpoint-best"))
 
-
 def main():
     run_experiment()
-
 
 if __name__ == '__main__':
     main()
