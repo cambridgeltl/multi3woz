@@ -2,6 +2,8 @@
 
 **Please note that this branch may be behind the main branch.**
 
+This repository reproduces the results reported in our paper, which may not incorporate changes or fixes we introduced to the dataset after the publication of this paper. If possible, please use the data and code in the main branch for your research.
+
 Code repository for the paper: <br>
 
 [***A Systematic Study of Performance Disparities in Multilingual Task-Oriented Dialogue Systems***](https://openreview.net/forum?id=aY4avQ0ItI)
