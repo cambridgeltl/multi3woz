@@ -2,6 +2,8 @@
 
 **Please note that this branch may be behind the main branch.**
 
+This repository reproduces the results reported in our paper, which may not incorporate changes or fixes we introduced to the dataset after the publication of this paper. If possible, please use the data and code in the main branch for your research.
+
 Data and Code to reproduce the results for the TACL paper:
 
 [***Multi3WOZ: A Multilingual, Multi-Domain, Multi-Parallel Dataset for Training and Evaluating Culturally Adapted Task-Oriented Dialog Systems***](https://arxiv.org/abs/2307.14031)
