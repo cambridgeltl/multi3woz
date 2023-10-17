@@ -4,7 +4,7 @@
 
 Code repository for the paper: <br>
 
-[***A Systematic Study of Performance Disparities in Multilingual Task-Oriented Dialogue Systems***](https://arxiv.org/abs/2307.14031)
+[***A Systematic Study of Performance Disparities in Multilingual Task-Oriented Dialogue Systems***](https://openreview.net/forum?id=aY4avQ0ItI)
 by [Songbo Hu](https://songbohu.github.io), [Han Zhou](https://hzhou.top), [Zhangdie Yuan](https://www.moyyuan.com), [Milan Gritta](https://github.com/milangritta), [Guchun Zhang](), [Ignacio Iacobacci](https://iiacobac.wordpress.com),  [Anna Korhonen](https://sites.google.com/site/annakorhonen/), and [Ivan Vulić](https://sites.google.com/site/ivanvulic/).
 
 
