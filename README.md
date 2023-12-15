@@ -15,6 +15,10 @@ Multi3WOZ is a novel multilingual, multi-domain, multi-parallel task-oriented di
 </p>
 
 
+## Highlights
+
+- [2023-12-15] The dataset has been updated to correct some errors previously present in the data. We recommend that future projects use this updated version of the dataset.
+
 
 ## This Repository
 
