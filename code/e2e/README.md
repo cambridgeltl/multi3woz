@@ -1,4 +1,7 @@
 # E2E Baseline
+
+🚨 We have released a new and arguably better end-to-end baseline system. It is easier to use than the code here. Please check our new [codebase](https://github.com/cambridgeltl/multi3woz/tree/main).
+
 This repository provides end-to-end ToD baselines on Multi3WOZ using seq2seq (i.e., encoder-decoder) models.
 
 ## Environment
