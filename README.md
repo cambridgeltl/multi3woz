@@ -18,7 +18,7 @@ Multi3WOZ is a novel multilingual, multi-domain, multi-parallel task-oriented di
 ## Highlights
 
 
-- [2024-01-15] We have released an improved end-to-end baseline. Check out our [DIALIGHT paper](https://arxiv.org/abs/2401.02208) and the [codebase](https://github.com/cambridgeltl/multi3woz/tree/main).
+- [2024-01-15] We have released an improved end-to-end baseline. Check out our [DIALIGHT paper](https://arxiv.org/abs/2401.02208) and the [codebase](https://github.com/cambridgeltl/e2e_tod_toolkit).
 
 - [2023-12-15] The dataset has been updated to correct some errors previously present in the data. We recommend that future projects use this updated version of the dataset.
 
